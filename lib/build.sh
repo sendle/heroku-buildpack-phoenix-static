@@ -24,12 +24,14 @@ download_node() {
   local platform=linux-x64
 
   if [ ! -f ${cached_node} ]; then
-    echo "Resolving node version $node_version..."
-    if ! read number url < <(curl --silent --get --retry 5 --retry-max-time 15 --data-urlencode "range=$node_version" "https://nodebin.herokai.com/v1/node/$platform/latest.txt"); then
-      fail_bin_install node $node_version;
-    fi
+    ## Skipping this as nodebin.herokai.com appears to not be available anymore
+    # echo "Resolving node version $node_version..."
+    # if ! read number url < <(curl --silent --get --retry 5 --retry-max-time 15 --data-urlencode "range=$node_version" "https://nodebin.herokai.com/v1/node/$platform/latest.txt"); then
+    #   fail_bin_install node $node_version;
+    # fi
 
-    echo "Downloading and installing node $number..."
+    echo "Downloading and installing node 16.5.0..."
+    local url="https://heroku-nodebin.s3.us-east-1.amazonaws.com/node/release/linux-x64/node-v16.5.0-linux-x64.tar.gz"
     local code=$(curl "$url" -L --silent --fail --retry 5 --retry-max-time 15 -o ${cached_node} --write-out "%{http_code}")
     if [ "$code" != "200" ]; then
       echo "Unable to download node: $code" && false
