@@ -30,8 +30,8 @@ download_node() {
     #   fail_bin_install node $node_version;
     # fi
 
-    echo "Downloading and installing node 16.5.0..."
-    local url="https://heroku-nodebin.s3.us-east-1.amazonaws.com/node/release/linux-x64/node-v16.5.0-linux-x64.tar.gz"
+    echo "Downloading and installing node 12.22.12..."
+    local url="https://heroku-nodebin.s3.us-east-1.amazonaws.com/node/release/linux-x64/node-v12.22.12-linux-x64.tar.gz"
     local code=$(curl "$url" -L --silent --fail --retry 5 --retry-max-time 15 -o ${cached_node} --write-out "%{http_code}")
     if [ "$code" != "200" ]; then
       echo "Unable to download node: $code" && false
