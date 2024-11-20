@@ -9,6 +9,9 @@ set -o errexit    # always exit on error
 set -o pipefail   # don't ignore exit codes when piping output
 unset GIT_DIR     # Avoid GIT_DIR leak from previous build steps
 
+# Copying the fix applied for NodeJS here:
+# https://github.com/heroku/heroku-buildpack-nodejs/pull/1347/files
+export UV_USE_IO_URING=${UV_USE_IO_URING:-0}
 
 ### Configure directories
 
@@ -21,7 +24,6 @@ heroku_dir=$build_dir/.heroku
 
 source ${build_pack_dir}/lib/common.sh
 source ${build_pack_dir}/lib/build.sh
-
 
 head "Loading configuration and environment"
 load_previous_npm_node_versions
