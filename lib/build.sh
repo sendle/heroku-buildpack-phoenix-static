@@ -24,14 +24,8 @@ download_node() {
   local platform=linux-x64
 
   if [ ! -f ${cached_node} ]; then
-    ## Skipping this as nodebin.herokai.com appears to not be available anymore
-    # echo "Resolving node version $node_version..."
-    # if ! read number url < <(curl --silent --get --retry 5 --retry-max-time 15 --data-urlencode "range=$node_version" "https://nodebin.herokai.com/v1/node/$platform/latest.txt"); then
-    #   fail_bin_install node $node_version;
-    # fi
-
-    echo "Downloading and installing node 18.20.5..."
-    local url="https://heroku-nodebin.s3.us-east-1.amazonaws.com/node/release/linux-x64/node-v18.20.5-linux-x64.tar.gz"
+    echo "Downloading node ${node_version}"
+    local url="https://heroku-nodebin.s3.us-east-1.amazonaws.com/node/release/linux-x64/node-v${node_version}-linux-x64.tar.gz"
     local code=$(curl "$url" -L --silent --fail --retry 5 --retry-max-time 15 -o ${cached_node} --write-out "%{http_code}")
     if [ "$code" != "200" ]; then
       echo "Unable to download node: $code" && false
@@ -79,10 +73,10 @@ install_node() {
 
 install_npm() {
   # Optionally bootstrap a different npm version
-  if [ ! $npm_version ] || [[ `npm --version` == "$npm_version" ]]; then
-    info "Using default npm version `npm --version`"
+  if [ ! $npm_version ] || [[ $(npm --version) == "$npm_version" ]]; then
+    info "Using default npm version $(npm --version)"
   else
-    info "Downloading and installing npm $npm_version (replacing version `npm --version`)..."
+    info "Downloading and installing npm $npm_version (replacing version $(npm --version))..."
     cd $build_dir
     npm install --unsafe-perm --quiet -g npm@$npm_version 2>&1 >/dev/null | indent
   fi
@@ -182,7 +176,10 @@ run_compile() {
 
   cd $phoenix_dir
 
-  has_clean=$(mix help "${phoenix_ex}.digest.clean" 1>/dev/null 2>&1; echo $?)
+  has_clean=$(
+    mix help "${phoenix_ex}.digest.clean" 1>/dev/null 2>&1
+    echo $?
+  )
 
   if [ $has_clean = 0 ]; then
     mkdir -p $cache_dir/phoenix-static
@@ -211,8 +208,8 @@ run_compile() {
 
 cache_versions() {
   info "Caching versions for future builds"
-  echo `node --version` > $cache_dir/node-version
-  echo `npm --version` > $cache_dir/npm-version
+  echo $(node --version) >$cache_dir/node-version
+  echo $(npm --version) >$cache_dir/npm-version
 }
 
 finalize_node() {
@@ -227,7 +224,7 @@ write_profile() {
   info "Creating runtime environment"
   mkdir -p $build_dir/.profile.d
   local export_line="export PATH=\"\$HOME/.heroku/node/bin:\$HOME/.heroku/yarn/bin:\$HOME/bin:\$HOME/$phoenix_relative_path/node_modules/.bin:\$PATH\""
-  echo $export_line >> $build_dir/.profile.d/phoenix_static_buildpack_paths.sh
+  echo $export_line >>$build_dir/.profile.d/phoenix_static_buildpack_paths.sh
 }
 
 remove_node() {
